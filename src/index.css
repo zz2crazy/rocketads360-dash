@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+
+@layer base {
+  :root {
+    --primary: #6c55f9;
+    --primary-dark: #5543e7;
+    --secondary: #ff6b6b;
+    --accent: #2ec5ce;
+    --background: #f6f8fd;
+    --foreground: #2d3748;
+  }
+
+  html {
+    font-family: 'Poppins', sans-serif;
+  }
+
+  body {
+    @apply bg-[--background] text-[--foreground];
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold tracking-tight;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 bg-[--primary] text-white rounded-md hover:bg-[--primary-dark] transition-colors duration-200 font-semibold text-base;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-white text-[--foreground] border border-gray-300 rounded-md hover:bg-gray-50 transition-colors duration-200 font-medium;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[--primary] focus:border-transparent transition-all duration-200;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-gray-100;
+  }
+
+  .stat-card {
+    @apply p-3 rounded-lg border border-gray-100 bg-gradient-to-br transition-transform duration-200 hover:scale-[1.02];
+  }
+}

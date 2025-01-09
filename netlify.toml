@@ -1,0 +1,37 @@
+# Production context
+[context.production]
+  command = "npm run build"
+  publish = "dist"
+  environment = { NODE_VERSION = "20" }
+
+# Branch deploy context
+[context.branch-deploy]
+  command = "npm run build"
+  publish = "dist"
+  environment = { NODE_VERSION = "20" }
+
+# Deploy preview context
+[context.deploy-preview]
+  command = "npm run build"
+  publish = "dist"
+  environment = { NODE_VERSION = "20" }
+
+# Build settings
+[build]
+  publish = "dist"
+  command = "npm run build"
+
+# Redirects and headers
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers
+[[headers]]
+  for = "/*"
+    [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
