@@ -16,10 +16,15 @@
 
   html {
     font-family: 'Poppins', sans-serif;
+    height: 100%;
   }
 
   body {
-    @apply bg-[--background] text-[--foreground];
+    @apply bg-[--background] text-[--foreground] min-h-screen;
+  }
+
+  #root {
+    @apply min-h-screen flex flex-col;
   }
 
   h1, h2, h3, h4, h5, h6 {

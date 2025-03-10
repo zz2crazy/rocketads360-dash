@@ -5,6 +5,7 @@ import { Logo } from '../components/Logo';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { signInWithEmail } from '../services/supabase/auth';
 import { AuthenticationError } from '../services/supabase/errors';
+import { debug } from '../lib/debug';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -18,21 +19,34 @@ export default function Login() {
     e.preventDefault();
     if (isSubmitting) return;
     
+    debug.group('login', 'Processing login submission');
+    console.log('Login submission started', { email }); // Debug log
+    
     setError('');
     setIsLoading(true);
     setIsSubmitting(true);
 
     try {
+      debug.info('login', `Attempting login for: ${email}`);
+      console.log('Initiating sign in process...'); // Debug log
+      
       const { profile } = await signInWithEmail(email, password);
+      
+      debug.info('login', 'Login successful, profile:', profile);
+      console.log('Sign in successful, navigating to dashboard...'); // Debug log
+      
       navigate(profile.role === 'customer' ? '/customer' : '/employee');
     } catch (err) {
+      debug.error('login', 'Login error:', err);
+      console.error('Login error details:', err); // Debug log
+      
       setError(err instanceof AuthenticationError 
         ? err.message 
         : 'An unexpected error occurred. Please try again.');
-      console.error('Unexpected login error:', err);
     } finally {
       setIsLoading(false);
       setIsSubmitting(false);
+      debug.groupEnd('login');
     }
   }
 
@@ -58,7 +72,7 @@ export default function Login() {
                 <p className="text-sm font-medium ml-2">{error}</p>
               </div>
             </div>)}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6" id="login-form">
             <div>
               <label className="block text-gray-700 text-sm font-medium mb-2">
                 Email Address
@@ -72,6 +86,7 @@ export default function Login() {
                 required
                 disabled={isSubmitting}
                 aria-disabled={isSubmitting}
+                data-testid="email-input"
               />
             </div>
             <div>
@@ -87,6 +102,7 @@ export default function Login() {
                 required
                 disabled={isSubmitting}
                 aria-disabled={isSubmitting}
+                data-testid="password-input"
               />
             </div>
             <button
@@ -94,6 +110,7 @@ export default function Login() {
               className="btn-primary w-full flex items-center justify-center will-change-transform"
               disabled={isSubmitting}
               aria-disabled={isSubmitting}
+              data-testid="submit-button"
             >
               {isLoading ? (
                 <span className="flex items-center">

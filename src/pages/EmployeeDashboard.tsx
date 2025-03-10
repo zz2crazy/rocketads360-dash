@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { Logo } from '../components/Logo';
 import { OrderFilters } from '../components/OrderFilters';
-import { LogOut, RefreshCw, UserPlus, User, Webhook, UserCog, Users } from 'lucide-react';
+import { LogOut, RefreshCw, UserPlus, User, Webhook, UserCog, Users, Shield, Building2, Settings, AlertCircle } from 'lucide-react';
 import { signOut } from '../services/supabase/auth';
 import { useAuth } from '../contexts/AuthContext';
 import { createClient } from '../services/supabase/client';
@@ -22,9 +21,10 @@ import type { Order, TimezoneStats } from '../types';
 
 export default function EmployeeDashboard() {
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [showAddClient, setShowAddClient] = useState(false);
   const [dateRange, setDateRange] = useState({
     start: new Date(Date.now() - 29 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
@@ -63,8 +63,12 @@ export default function EmployeeDashboard() {
   });
 
   useEffect(() => {
+    if (user?.role !== 'employee' && user?.role !== 'super_admin') {
+      navigate('/');
+      return;
+    }
     loadOrders();
-  }, []);
+  }, [user, navigate]);
 
   useEffect(() => {
     filterOrders();
@@ -73,7 +77,6 @@ export default function EmployeeDashboard() {
   function filterOrders() {
     let filtered = [...orders];
 
-    // Apply date range filter
     if (dateRange.start) {
       filtered = filtered.filter(order => 
         new Date(order.created_at) >= new Date(dateRange.start)
@@ -85,14 +88,12 @@ export default function EmployeeDashboard() {
       );
     }
 
-    // Apply client filter
     if (selectedClient) {
       filtered = filtered.filter(order => 
         order.client_name === selectedClient
       );
     }
 
-    // Apply status filter
     if (selectedStatus) {
       filtered = filtered.filter(order => 
         order.status === selectedStatus
@@ -105,12 +106,14 @@ export default function EmployeeDashboard() {
   async function loadOrders() {
     try {
       setIsLoading(true);
+      setError(null);
       const data = await fetchOrders();
       setOrders(data);
       setFilteredOrders(data);
       const orderStats = await fetchOrderStats(data);
       setStats(orderStats);
     } catch (error) {
+      setError(error instanceof Error ? error.message : 'Failed to load orders');
       console.error('Error loading orders:', error);
     } finally {
       setIsLoading(false);
@@ -231,6 +234,27 @@ export default function EmployeeDashboard() {
                 </button>
               )}
               <button
+                onClick={() => navigate('/bm-management')}
+                className="flex items-center text-primary hover:text-primary-dark"
+              >
+                <Building2 className="h-5 w-5 mr-2" />
+                BM Management
+              </button>
+              <button
+                onClick={() => navigate('/provider-management')}
+                className="flex items-center text-primary hover:text-primary-dark"
+              >
+                <Settings className="h-5 w-5 mr-2" />
+                Providers
+              </button>
+              <button
+                onClick={() => navigate('/account-management')}
+                className="flex items-center text-primary hover:text-primary-dark"
+              >
+                <Shield className="h-5 w-5 mr-2" />
+                Account Management
+              </button>
+              <button
                 onClick={() => setShowAddClient(true)}
                 className="flex items-center text-blue-600 hover:text-blue-700"
               >
@@ -250,6 +274,21 @@ export default function EmployeeDashboard() {
       </nav>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div className="flex items-center">
+              <AlertCircle className="h-5 w-5 text-red-500 mr-2" />
+              <p className="text-sm text-red-600">{error}</p>
+            </div>
+            <button
+              onClick={loadOrders}
+              className="mt-2 text-sm text-red-600 hover:text-red-800 font-medium"
+            >
+              Try Again
+            </button>
+          </div>
+        )}
+
         {isLoading ? (
           <LoadingSpinner size="lg" className="my-12" />
         ) : (
@@ -338,7 +377,7 @@ export default function EmployeeDashboard() {
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
-                        {format(new Date(order.created_at), 'MMM d, yyyy HH:mm')}
+                        {new Date(order.created_at).toLocaleString()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
                         <select

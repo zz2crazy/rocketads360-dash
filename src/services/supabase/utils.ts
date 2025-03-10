@@ -16,3 +16,21 @@ export function isSupabaseError(error: unknown): error is { code: string; messag
     'message' in error
   );
 }
+
+export function isDatabaseError(error: unknown): boolean {
+  return (
+    isSupabaseError(error) &&
+    error.code.startsWith('PGRST') || 
+    error.code.startsWith('23')
+  );
+}
+
+export function formatError(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  if (typeof error === 'string') {
+    return error;
+  }
+  return 'An unexpected error occurred';
+}

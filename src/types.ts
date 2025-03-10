@@ -1,3 +1,5 @@
+import type { Profile } from '@supabase/supabase-js';
+
 export interface Profile {
   id: string;
   email: string;
@@ -7,31 +9,27 @@ export interface Profile {
   created_at: string;
 }
 
-export interface WebhookSetting {
+export interface BusinessManager {
   id: string;
-  client_id: string;
-  webhook_url: string;
-  is_active: boolean;
+  provider_id: string;
+  bm_id: string;
+  name: string;
+  status: 'active' | 'inactive' | 'error';
+  last_sync: string;
   created_at: string;
-  updated_at: string;
-  payload_config?: WebhookPayloadConfig;
-  client?: Profile;
+  error_message?: string;
+  provider?: BMProvider;
 }
 
-export interface WebhookPayloadConfig {
-  orderCreated: string;
-  orderUpdated: string;
-}
-
-export interface Order {
+export interface BMProvider {
   id: string;
-  user_id: string;
-  client_name: string;
-  account_count: number;
-  timezone: string;
-  account_name_spec?: string;
-  status: 'pending' | 'processing' | 'completed' | 'cancelled';
+  name: string;
+  api_key?: string;
+  api_secret?: string;
+  status: 'active' | 'inactive';
   created_at: string;
+  created_by: string;
+  created_by_profile?: Profile;
 }
 
 export interface TimezoneStats {

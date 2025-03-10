@@ -19,3 +19,10 @@ export class AuthenticationError extends SupabaseError {
     this.name = 'AuthenticationError';
   }
 }
+
+export class DatabaseError extends SupabaseError {
+  constructor(message: string, code?: string, cause?: Error) {
+    super(message, code, cause);
+    this.name = 'DatabaseError';
+  }
+}

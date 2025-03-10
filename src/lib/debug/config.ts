@@ -1,5 +1,5 @@
 export const DEBUG_CONFIG = {
-  enabled: false,
+  enabled: true,
   levels: {
     error: true,
     warn: true,
@@ -8,12 +8,15 @@ export const DEBUG_CONFIG = {
     trace: true
   },
   modules: {
-    auth: false,
-    orders: false,
-    profile: false,
-    webhook: false,
-    api: false
+    auth: true,
+    orders: true,
+    profile: true,
+    webhook: true,
+    api: true,
+    supabase: true,
+    login: true
   }
 } as const;
 
 export type DebugLevel = keyof typeof DEBUG_CONFIG.levels;
+export type DebugModule = keyof typeof DEBUG_CONFIG.modules;
